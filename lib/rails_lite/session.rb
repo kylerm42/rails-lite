@@ -22,6 +22,7 @@ class Session
   # serialize the hash into json and save in a cookie
   # add to the responses cookies
   def store_session(res)
+    @session[:authentication_token] = SecureRandom.urlsafe_base64
     cookie = WEBrick::Cookie.new("_rails_lite_app", @session.to_json)
     res.cookies << cookie
   end

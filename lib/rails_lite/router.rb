@@ -15,7 +15,8 @@ class Route
   # instantiate controller and call controller action
   def run(req, res)
     matches = @pattern.match(req.path)
-    controller_class.new(req, res, matches).invoke_action(@action_name)
+    route_params = Hash[matches.names.map(&:to_sym).zip(matches.captures)]
+    controller_class.new(req, res, route_params).invoke_action(@action_name, @http_method)
   end
 end
 

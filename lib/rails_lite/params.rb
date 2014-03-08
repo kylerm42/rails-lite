@@ -6,22 +6,28 @@ class Params
   # 2. post body
   # 3. route params
   def initialize(req, route_params = {})
-    @params ||= route_params
+    @params = route_params
     @params.deep_merge(parse_www_encoded_form(req.query_string)) unless req.query_string.nil?
     @params.deep_merge(parse_www_encoded_form(req.body)) unless req.body.nil?
     p @params
+
+    @permitted = []
   end
 
   def [](key)
+    @params[key]
   end
 
   def permit(*keys)
+    @permitted += keys
   end
 
   def require(key)
+    raise AttributeNotFoundError unless @params.keys.include?(key)
   end
 
   def permitted?(key)
+    @permitted.include?(key)
   end
 
   def to_s
@@ -41,7 +47,6 @@ class Params
     @params = {}
     param_arr.each do |pair|
       keys = parse_key(pair.first)
-
       hash_val = pair.last
       keys.reverse.each do |key|
         hash_val = { key => hash_val }
